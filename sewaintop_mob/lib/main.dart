@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sewaintop_mob/views/home/home_screen.dart'; // Point to the new home_screen location
+import 'package:sewaintop_mob/views/main_navigation.dart'; // Import the unified navigation shell
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Inter',
       ),
-      home: const HomeScreen(), // Point directly to the HomeScreen
+      home: const MainNavigationScaffold(), // Use MainNavigationScaffold
     );
   }
 }
