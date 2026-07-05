@@ -9,11 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:sewaintop_mob/main.dart';
+import 'package:sewaintop_mob/repositories/auth_repository.dart';
+import 'package:sewaintop_mob/repositories/laptop_repository.dart';
+import 'package:sewaintop_mob/repositories/booking_repository.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp(
+      authRepository: AuthRepository(),
+      laptopRepository: LaptopRepository(),
+      bookingRepository: BookingRepository(),
+    ));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

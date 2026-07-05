@@ -1,5 +1,11 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_state.dart';
+import 'package:sewaintop_mob/blocs/laptop/laptop_bloc.dart';
+import 'package:sewaintop_mob/blocs/laptop/laptop_event.dart';
+import 'package:sewaintop_mob/blocs/laptop/laptop_state.dart';
 import 'package:sewaintop_mob/constants/app_colors.dart';
 import 'package:sewaintop_mob/models/laptop_model.dart';
 import 'package:sewaintop_mob/views/home/widgets/filter_bottom_sheet.dart'; // Import bottom sheet
@@ -31,212 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'Video Editing'
   ];
 
-  final List<Laptop> _laptops = [
-    Laptop(
-      title: 'ASUS ROG Strix G15',
-      price: 'Rp 150.000/hari',
-      tags: ['16GB', 'RTX 4060'],
-      rating: 4.9,
-      reviews: 18,
-      imageUrl: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80',
-      category: 'Gaming',
-      ram: '16GB',
-      processor: 'AMD Ryzen',
-      priceNumeric: 150000.0,
-      isAvailable: true,
-      cpu: 'Intel i9-13900H',
-      storage: '1 TB NVMe',
-      gpu: 'RTX 4070',
-      display: '15.6" 144Hz',
-      os: 'Windows 11 Pro',
-      priceWeek: 'Rp 900rb',
-      priceMonth: 'Rp 3.2jt',
-      shopName: 'Rafa Tech Laptop',
-      shopArea: 'Mangga Dua, Jakarta Barat',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-    Laptop(
-      title: 'Lenovo Legion 5',
-      price: 'Rp 130.000/hari',
-      tags: ['16GB', 'RTX 3060'],
-      rating: 4.7,
-      reviews: 9,
-      imageUrl: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=600&q=80',
-      category: 'Gaming',
-      ram: '16GB',
-      processor: 'AMD Ryzen',
-      priceNumeric: 130000.0,
-      isAvailable: true,
-      cpu: 'AMD Ryzen 7-6800H',
-      storage: '512 GB NVMe',
-      gpu: 'RTX 3060',
-      display: '15.6" 165Hz',
-      os: 'Windows 11 Home',
-      priceWeek: 'Rp 780rb',
-      priceMonth: 'Rp 2.8jt',
-      shopName: 'Mega Rental Indo',
-      shopArea: 'Senen, Jakarta Pusat',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-    Laptop(
-      title: 'MacBook Pro 14',
-      price: 'Rp 250.000/hari',
-      tags: ['18GB', 'M3 Pro'],
-      rating: 4.9,
-      reviews: 21,
-      imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80',
-      category: 'Design',
-      ram: '16GB',
-      processor: 'Apple M-series',
-      priceNumeric: 250000.0,
-      isAvailable: true,
-      cpu: 'Apple M3 Pro (11-core)',
-      storage: '512 GB Unified',
-      gpu: '14-core GPU',
-      display: '14.2" Liquid Retina XDR',
-      os: 'macOS Sonoma',
-      priceWeek: 'Rp 1.5jt',
-      priceMonth: 'Rp 5.2jt',
-      shopName: 'Apple Space Jakarta',
-      shopArea: 'Sudirman, Jakarta Selatan',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-    Laptop(
-      title: 'Dell XPS 13',
-      price: 'Rp 110.000/hari',
-      tags: ['8GB', 'Intel i7'],
-      rating: 4.6,
-      reviews: 15,
-      imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
-      category: 'Office',
-      ram: '8GB',
-      processor: 'Intel Core',
-      priceNumeric: 110000.0,
-      isAvailable: true,
-      cpu: 'Intel Core i7-1260P',
-      storage: '512 GB SSD',
-      gpu: 'Intel Iris Xe Graphics',
-      display: '13.4" FHD+ Touch',
-      os: 'Windows 11 Home',
-      priceWeek: 'Rp 650rb',
-      priceMonth: 'Rp 2.3jt',
-      shopName: 'Rafa Tech Laptop',
-      shopArea: 'Mangga Dua, Jakarta Barat',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-    Laptop(
-      title: 'HP Victus 16',
-      price: 'Rp 95.000/hari',
-      tags: ['8GB', 'RTX 3050'],
-      rating: 4.4,
-      reviews: 8,
-      imageUrl: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80',
-      category: 'Gaming',
-      ram: '8GB',
-      processor: 'Intel Core',
-      priceNumeric: 95000.0,
-      isAvailable: false,
-      cpu: 'Intel Core i5-12500H',
-      storage: '512 GB NVMe',
-      gpu: 'RTX 3050',
-      display: '16.1" 144Hz FHD',
-      os: 'Windows 11 Home',
-      priceWeek: 'Rp 580rb',
-      priceMonth: 'Rp 2.0jt',
-      shopName: 'Computer Square',
-      shopArea: 'Kuningan, Jakarta Selatan',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-    Laptop(
-      title: 'MacBook Air M2',
-      price: 'Rp 140.000/hari',
-      tags: ['8GB', 'M2 Chip'],
-      rating: 4.8,
-      reviews: 18,
-      imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=600&q=80',
-      category: 'Office',
-      ram: '8GB',
-      processor: 'Apple M-series',
-      priceNumeric: 140000.0,
-      isAvailable: true,
-      cpu: 'Apple M2 (8-core)',
-      storage: '256 GB Unified',
-      gpu: '8-core GPU',
-      display: '13.6" Liquid Retina',
-      os: 'macOS Sonoma',
-      priceWeek: 'Rp 820rb',
-      priceMonth: 'Rp 3.0jt',
-      shopName: 'Apple Space Jakarta',
-      shopArea: 'Sudirman, Jakarta Selatan',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-    Laptop(
-      title: 'ASUS ZenBook Duo',
-      price: 'Rp 280.000/hari',
-      tags: ['32GB', 'Dual Screen'],
-      rating: 4.7,
-      reviews: 6,
-      imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=600&q=80',
-      category: 'Design',
-      ram: '32GB',
-      processor: 'Intel Core',
-      priceNumeric: 280000.0,
-      isAvailable: true,
-      cpu: 'Intel Core i9-13900H',
-      storage: '2 TB NVMe SSD',
-      gpu: 'Intel Iris Xe Graphics',
-      display: '14.5" OLED 120Hz Touch',
-      os: 'Windows 11 Pro',
-      priceWeek: 'Rp 1.7jt',
-      priceMonth: 'Rp 6.0jt',
-      shopName: 'Mega Rental Indo',
-      shopArea: 'Senen, Jakarta Pusat',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-    Laptop(
-      title: 'Acer Aspire 5',
-      price: 'Rp 60.000/hari',
-      tags: ['4GB', 'Core i3'],
-      rating: 4.1,
-      reviews: 5,
-      imageUrl: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80',
-      category: 'Office',
-      ram: '4GB',
-      processor: 'Intel Core',
-      priceNumeric: 60000.0,
-      isAvailable: true,
-      cpu: 'Intel Core i3-1115G4',
-      storage: '256 GB SSD',
-      gpu: 'Intel UHD Graphics',
-      display: '14" HD LED',
-      os: 'Windows 10 Home',
-      priceWeek: 'Rp 360rb',
-      priceMonth: 'Rp 1.3jt',
-      shopName: 'Computer Square',
-      shopArea: 'Kuningan, Jakarta Selatan',
-      imageUrls: [
-        'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80',
-      ],
-    ),
-  ];
+  List<Laptop> _laptops = [];
 
   @override
   void initState() {
@@ -251,6 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchController.addListener(() {
       setState(() {}); // trigger rebuild on search query change
     });
+
+    // Fetch laptops from BLoC on startup
+    context.read<LaptopBloc>().add(const LoadLaptops());
   }
 
   @override
@@ -261,87 +65,153 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Filter logic
-    final filteredLaptops = _laptops.where((laptop) {
-      // Search text filter
-      final query = _searchController.text.toLowerCase();
-      if (query.isNotEmpty && !laptop.title.toLowerCase().contains(query)) {
-        return false;
-      }
-
-      // Top category chips filter (if active and not "Semua")
-      if (_selectedCategoryIndex > 0) {
-        final categoryName = _categories[_selectedCategoryIndex];
-        if (laptop.category != categoryName) {
-          return false;
-        }
-      }
-
-      // Bottom sheet criteria filters
-      if (_activeCriteria.category != null &&
-          laptop.category != _activeCriteria.category) {
-        return false;
-      }
-      if (_activeCriteria.ram != null && laptop.ram != _activeCriteria.ram) {
-        return false;
-      }
-      if (_activeCriteria.processor != null &&
-          laptop.processor != _activeCriteria.processor) {
-        return false;
-      }
-      if (laptop.priceNumeric < _activeCriteria.priceRange.start ||
-          laptop.priceNumeric > _activeCriteria.priceRange.end) {
-        return false;
-      }
-      if (_activeCriteria.availableOnly && !laptop.isAvailable) {
-        return false;
-      }
-
-      return true;
-    }).toList();
-
-    // 2. Sorting logic
-    if (_selectedSort == 'Harga Terendah') {
-      filteredLaptops.sort((a, b) => a.priceNumeric.compareTo(b.priceNumeric));
-    } else if (_selectedSort == 'Harga Tertinggi') {
-      filteredLaptops.sort((a, b) => b.priceNumeric.compareTo(a.priceNumeric));
-    } else if (_selectedSort == 'Rating Tertinggi') {
-      filteredLaptops.sort((a, b) => b.rating.compareTo(a.rating));
-    } else if (_selectedSort == 'Terbaru') {
-      // Keep natural list order
-    }
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: BlocBuilder<LaptopBloc, LaptopState>(
+            builder: (context, state) {
+              if (state is LaptopInitial || state is LaptopLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (state is LaptopError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                      const SizedBox(height: 16),
+                      Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: AppColors.textDark, fontSize: 14),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<LaptopBloc>().add(const LoadLaptops(forceRefresh: true));
+                        },
+                        child: const Text('Coba Lagi'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              List<Laptop> laptopsToRender = [];
+              bool isFromCache = false;
+              if (state is LaptopLoaded) {
+                laptopsToRender = state.laptops;
+                isFromCache = state.isFromCache;
+              }
+
+              // 1. Filter logic
+              final filteredLaptops = laptopsToRender.where((laptop) {
+                // Search text filter
+                final query = _searchController.text.toLowerCase();
+                if (query.isNotEmpty && !laptop.title.toLowerCase().contains(query)) {
+                  return false;
+                }
+
+                // Top category chips filter (if active and not "Semua")
+                if (_selectedCategoryIndex > 0) {
+                  final categoryName = _categories[_selectedCategoryIndex];
+                  if (laptop.category != categoryName) {
+                    return false;
+                  }
+                }
+
+                // Bottom sheet criteria filters
+                if (_activeCriteria.category != null &&
+                    laptop.category != _activeCriteria.category) {
+                  return false;
+                }
+                if (_activeCriteria.ram != null && laptop.ram != _activeCriteria.ram) {
+                  return false;
+                }
+                if (_activeCriteria.processor != null &&
+                    laptop.processor != _activeCriteria.processor) {
+                  return false;
+                }
+                if (laptop.priceNumeric < _activeCriteria.priceRange.start ||
+                    laptop.priceNumeric > _activeCriteria.priceRange.end) {
+                  return false;
+                }
+                if (_activeCriteria.availableOnly && !laptop.isAvailable) {
+                  return false;
+                }
+
+                return true;
+              }).toList();
+
+              // 2. Sorting logic
+              if (_selectedSort == 'Harga Terendah') {
+                filteredLaptops.sort((a, b) => a.priceNumeric.compareTo(b.priceNumeric));
+              } else if (_selectedSort == 'Harga Tertinggi') {
+                filteredLaptops.sort((a, b) => b.priceNumeric.compareTo(a.priceNumeric));
+              } else if (_selectedSort == 'Rating Tertinggi') {
+                filteredLaptops.sort((a, b) => b.rating.compareTo(a.rating));
+              }
+
+              // Return the main content Column
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (isFromCache)
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.wifi_off, size: 16, color: Colors.amber.shade900),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Anda sedang offline. Menampilkan data cache lokal.',
+                              style: TextStyle(fontSize: 12, color: Colors.amber.shade900, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
               const SizedBox(height: 16),
               
               // 1. Header Row (Halo, Rafi + Bell Notification)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Text(
-                        'Halo, Rafi',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textDark,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      const Text(
-                        '👋',
-                        style: TextStyle(fontSize: 22),
-                      ),
-                    ],
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      String userName = 'User';
+                      if (state is Authenticated) {
+                        userName = state.user.name.split(' ').first;
+                      }
+                      return Row(
+                        children: [
+                          Text(
+                            'Halo, $userName',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textDark,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            '👋',
+                            style: TextStyle(fontSize: 22),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   Stack(
                     children: [
@@ -866,10 +736,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-            ],
-          ),
+              ],
+            );
+          },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

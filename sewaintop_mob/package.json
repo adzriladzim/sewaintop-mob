@@ -1,0 +1,8 @@
+{
+  "name": "sewaintop-mock-api",
+  "version": "1.0.0",
+  "description": "Mock API server for Sewaintop",
+  "scripts": {
+    "api": "npx -y json-server@0.17.4 --watch db.json --port 3000"
+  }
+}

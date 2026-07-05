@@ -1,7 +1,14 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_state.dart';
+import 'package:sewaintop_mob/blocs/booking/booking_bloc.dart';
+import 'package:sewaintop_mob/blocs/booking/booking_event.dart';
+import 'package:sewaintop_mob/blocs/booking/booking_state.dart';
 import 'package:sewaintop_mob/constants/app_colors.dart';
 import 'package:sewaintop_mob/models/laptop_model.dart';
+import 'package:sewaintop_mob/models/booking_model.dart';
 import 'package:sewaintop_mob/views/booking/booking_success_screen.dart'; // Import success screen
 
 class BookingRequestScreen extends StatefulWidget {
@@ -81,21 +88,35 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
   }
 
   void _submitRequest() {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! Authenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Anda harus masuk terlebih dahulu.')),
+      );
+      return;
+    }
+
     final duration = _calculateDuration();
     final total = _calculateTotal();
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BookingSuccessScreen(
-          laptop: widget.laptop,
-          startDate: _startDate,
-          endDate: _endDate,
-          duration: duration,
-          total: total,
-        ),
-      ),
+    final booking = Booking(
+      id: 0,
+      userId: authState.user.id,
+      laptopId: widget.laptop.id,
+      laptopTitle: widget.laptop.title,
+      laptopImage: widget.laptop.imageUrl,
+      startDate: _startDate.toIso8601String().split('T').first,
+      endDate: _endDate.toIso8601String().split('T').first,
+      duration: duration,
+      pricePerDay: widget.laptop.priceNumeric,
+      totalPrice: total,
+      status: 'active',
+      notes: _notesController.text.trim(),
+      shopName: widget.laptop.shopName,
+      createdAt: DateTime.now().toIso8601String(),
     );
+
+    context.read<BookingBloc>().add(CreateBooking(booking: booking));
   }
 
   @override
@@ -104,8 +125,29 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     final duration = _calculateDuration();
     final total = _calculateTotal();
 
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return BlocListener<BookingBloc, BookingState>(
+      listener: (context, state) {
+        if (state is BookingCreatedSuccess) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BookingSuccessScreen(
+                laptop: widget.laptop,
+                startDate: _startDate,
+                endDate: _endDate,
+                duration: duration,
+                total: total,
+              ),
+            ),
+          );
+        } else if (state is BookingError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -338,31 +380,46 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
             ),
             child: SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _submitRequest,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Kirim Permintaan Sewa',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              child: BlocBuilder<BookingBloc, BookingState>(
+                builder: (context, state) {
+                  final isLoading = state is BookingLoading;
+                  return ElevatedButton(
+                    onPressed: isLoading ? null : _submitRequest,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Kirim Permintaan Sewa',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  );
+                },
               ),
             ),
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildStepper() {
     return Row(

@@ -14,6 +14,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   // Mock favorites list matching the screenshot
   final List<Laptop> _favorites = [
     Laptop(
+      id: 1,
       title: 'ASUS ROG Strix G15',
       price: 'Rp 150.000/hari',
       tags: ['16GB', 'RTX 4070'],
@@ -37,6 +38,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       imageUrls: ['https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80'],
     ),
     Laptop(
+      id: 3,
       title: 'MacBook Pro 14',
       price: 'Rp 250.000/hari',
       tags: ['18GB', 'M3 Pro'],
@@ -60,6 +62,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       imageUrls: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80'],
     ),
     Laptop(
+      id: 2,
       title: 'Lenovo ThinkPad X1',
       price: 'Rp 120.000/hari',
       tags: ['16GB', 'Intel i7'],

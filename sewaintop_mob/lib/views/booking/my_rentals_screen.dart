@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_state.dart';
+import 'package:sewaintop_mob/blocs/booking/booking_bloc.dart';
+import 'package:sewaintop_mob/blocs/booking/booking_event.dart';
+import 'package:sewaintop_mob/blocs/booking/booking_state.dart';
 import 'package:sewaintop_mob/constants/app_colors.dart';
+import 'package:sewaintop_mob/models/booking_model.dart';
 
 class MyRentalsScreen extends StatefulWidget {
   const MyRentalsScreen({super.key});
@@ -14,6 +21,13 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
   final List<String> _tabs = ['Berlangsung', 'Selesai', 'Dibatalkan'];
 
   @override
+  void initState() {
+    super.initState();
+    final authState = context.read<AuthBloc>().state;
+    if (authState is Authenticated) {
+      context.read<BookingBloc>().add(LoadMyBookings(userId: authState.user.id));
+    }
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -109,136 +123,169 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
 
           // Main Tab Content
           Expanded(
-            child: _activeTab == 0
-                ? _buildActiveRentals()
-                : _buildEmptyState(_tabs[_activeTab]),
+            child: BlocBuilder<BookingBloc, BookingState>(
+              builder: (context, state) {
+                if (state is BookingInitial || state is BookingLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (state is BookingError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        const SizedBox(height: 16),
+                        Text(state.message, style: const TextStyle(color: AppColors.textDark)),
+                      ],
+                    ),
+                  );
+                }
+
+                List<Booking> list = [];
+                bool isFromCache = false;
+                if (state is BookingLoaded) {
+                  list = state.bookings;
+                  isFromCache = state.isFromCache;
+                }
+
+                final targetStatus = _activeTab == 0
+                    ? 'active'
+                    : _activeTab == 1
+                        ? 'completed'
+                        : 'cancelled';
+
+                final filteredList = list.where((b) => b.status == targetStatus).toList();
+
+                if (filteredList.isEmpty) {
+                  return _buildEmptyState(_tabs[_activeTab]);
+                }
+
+                return Column(
+                  children: [
+                    if (isFromCache)
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.wifi_off, size: 16, color: Colors.amber.shade900),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Anda sedang offline. Menampilkan riwayat sewa dari cache lokal.',
+                                style: TextStyle(fontSize: 12, color: Colors.amber.shade900, fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filteredList.length,
+                        itemBuilder: (context, index) {
+                          final booking = filteredList[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: _buildBookingItem(booking),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildActiveRentals() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // 1. ASUS ROG G15 (Menunggu)
-        _buildRentalCard(
-          title: 'ASUS ROG G15',
-          dates: '15–20 Jun 2026 · 5 hari',
-          price: 'Rp 750.000',
-          imageUrl: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=150&q=80',
-          borderColor: const Color(0xFFF59E0B), // Amber/Yellow
-          statusBadge: _buildStatusBadge('⏳', 'Menunggu', const Color(0xFFFEF3C7), const Color(0xFFD97706)),
-          actions: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Permintaan sewa dibatalkan')),
-                  );
-                },
-                child: const Text(
-                  'Batalkan',
-                  style: TextStyle(
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textDark,
-                  side: const BorderSide(color: AppColors.cardBorder),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-                child: const Text('Hubungi', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
+  Widget _buildBookingItem(Booking booking) {
+    Color borderColor = Colors.amber;
+    Widget statusBadge = _buildStatusBadge('⏳', 'Menunggu', const Color(0xFFFEF3C7), const Color(0xFFD97706));
 
-        // 2. ThinkPad X1 Carbon (Disetujui)
-        _buildRentalCard(
-          title: 'ThinkPad X1 Carbon',
-          dates: '22–28 Jun · 6 hari',
-          price: 'Rp 540.000',
-          imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=150&q=80',
-          borderColor: const Color(0xFF10B981), // Green
-          statusBadge: _buildStatusBadge('✓', 'Disetujui', const Color(0xFFD1FAE5), const Color(0xFF047857)),
-          actions: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              OutlinedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.chat_bubble_outline, size: 16),
-                label: const Text('Chat'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textDark,
-                  side: const BorderSide(color: AppColors.cardBorder),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-              ),
-              const SizedBox(width: 12),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textDark,
-                  side: const BorderSide(color: AppColors.cardBorder),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-                child: const Text('Lihat Detail', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
+    if (booking.status == 'completed') {
+      borderColor = const Color(0xFF10B981);
+      statusBadge = _buildStatusBadge('✓', 'Selesai', const Color(0xFFD1FAE5), const Color(0xFF047857));
+    } else if (booking.status == 'cancelled') {
+      borderColor = Colors.red;
+      statusBadge = _buildStatusBadge('✕', 'Dibatalkan', const Color(0xFFFEE2E2), Colors.red.shade700);
+    } else if (booking.status == 'active') {
+      borderColor = AppColors.primary;
+      statusBadge = _buildStatusBadge('🔵', 'Aktif', const Color(0xFFDBEAFE), AppColors.primary);
+    }
 
-        // 3. MacBook Air M2 (Aktif)
-        _buildRentalCard(
-          title: 'MacBook Air M2',
-          dates: 'Berlangsung hingga 5 Jul',
-          price: 'Rp 540.000',
-          imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=150&q=80',
-          borderColor: AppColors.primary, // Blue
-          statusBadge: _buildStatusBadge('🔵', 'Aktif', const Color(0xFFDBEAFE), AppColors.primary),
-          actions: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              OutlinedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.chat_bubble_outline, size: 16),
-                label: const Text('Chat'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textDark,
-                  side: const BorderSide(color: AppColors.cardBorder),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    final String dateString = '${booking.startDate} – ${booking.endDate} · ${booking.duration} hari';
+
+    return _buildRentalCard(
+      title: booking.laptopTitle,
+      dates: dateString,
+      price: 'Rp ${_formatPrice(booking.totalPrice)}',
+      imageUrl: booking.laptopImage,
+      borderColor: borderColor,
+      statusBadge: statusBadge,
+      actions: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (booking.status == 'active')
+            TextButton(
+              onPressed: () {
+                final authState = context.read<AuthBloc>().state;
+                if (authState is Authenticated) {
+                  context.read<BookingBloc>().add(
+                        CancelBookingEvent(
+                          bookingId: booking.id,
+                          userId: authState.user.id,
+                        ),
+                      );
+                }
+              },
+              child: const Text(
+                'Batalkan',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 12),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textDark,
-                  side: const BorderSide(color: AppColors.cardBorder),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-                child: const Text('Lihat Detail', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
+            ),
+          const SizedBox(width: 16),
+          OutlinedButton(
+            onPressed: () {},
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.textDark,
+              side: const BorderSide(color: AppColors.cardBorder),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            child: const Text('Hubungi', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  String _formatPrice(double value) {
+    final intVal = value.round();
+    String str = intVal.toString();
+    String result = '';
+    int count = 0;
+    for (int i = str.length - 1; i >= 0; i--) {
+      result = str[i] + result;
+      count++;
+      if (count == 3 && i > 0) {
+        result = '.$result';
+        count = 0;
+      }
+    }
+    return result;
   }
 
   Widget _buildRentalCard({

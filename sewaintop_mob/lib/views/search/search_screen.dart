@@ -1,5 +1,8 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sewaintop_mob/blocs/laptop/laptop_bloc.dart';
+import 'package:sewaintop_mob/blocs/laptop/laptop_state.dart';
 import 'package:sewaintop_mob/constants/app_colors.dart';
 import 'package:sewaintop_mob/models/laptop_model.dart';
 import 'package:sewaintop_mob/views/detail/laptop_detail_screen.dart';
@@ -31,111 +34,9 @@ class _SearchScreenState extends State<SearchScreen> {
     {'name': 'Editing', 'icon': Icons.movie_filter_outlined, 'color': Color(0xFFFEF2F2), 'iconColor': Color(0xFFEF4444)},
   ];
 
-  // Dummy list of laptops to search from
-  final List<Laptop> _allLaptops = [
-    Laptop(
-      title: 'ASUS ROG Strix G15',
-      price: 'Rp 150.000/hari',
-      tags: ['16GB', 'RTX 4060'],
-      rating: 4.9,
-      reviews: 12,
-      imageUrl: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=300&q=80',
-      category: 'Gaming',
-      ram: '16GB',
-      processor: 'AMD Ryzen',
-      priceNumeric: 150000.0,
-      isAvailable: true,
-      cpu: 'AMD Ryzen 7 6800H',
-      storage: '512 GB SSD',
-      gpu: 'RTX 4060 8GB',
-      display: '15.6" FHD 144Hz',
-      os: 'Windows 11',
-      priceWeek: 'Rp 950rb',
-      priceMonth: 'Rp 3.5jt',
-      shopName: 'Rafa Tech Laptop',
-      shopArea: 'Mangga Dua, Jakarta Barat',
-      imageUrls: ['https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80'],
-    ),
-    Laptop(
-      title: 'MacBook Pro 14 M2',
-      price: 'Rp 250.000/hari',
-      tags: ['16GB', 'M2 Pro'],
-      rating: 4.9,
-      reviews: 21,
-      imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=300&q=80',
-      category: 'Design',
-      ram: '16GB',
-      processor: 'Apple M-series',
-      priceNumeric: 250000.0,
-      isAvailable: true,
-      cpu: 'Apple M2 Pro (10-core)',
-      storage: '512 GB Unified',
-      gpu: '16-core GPU',
-      display: '14.2" Liquid Retina XDR',
-      os: 'macOS Ventura',
-      priceWeek: 'Rp 1.6jt',
-      priceMonth: 'Rp 5.5jt',
-      shopName: 'Apple Space Jakarta',
-      shopArea: 'Sudirman, Jakarta Selatan',
-      imageUrls: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80'],
-    ),
-    Laptop(
-      title: 'Lenovo ThinkPad X1 Carbon',
-      price: 'Rp 120.000/hari',
-      tags: ['16GB', 'Intel i7'],
-      rating: 4.7,
-      reviews: 9,
-      imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=300&q=80',
-      category: 'Office',
-      ram: '16GB',
-      processor: 'Intel Core',
-      priceNumeric: 120000.0,
-      isAvailable: true,
-      cpu: 'Intel Core i7-1260P',
-      storage: '1 TB NVMe',
-      gpu: 'Intel Iris Xe',
-      display: '14" WUXGA IPS',
-      os: 'Windows 11 Pro',
-      priceWeek: 'Rp 750rb',
-      priceMonth: 'Rp 2.8jt',
-      shopName: 'Mega Rental Indo',
-      shopArea: 'Senen, Jakarta Pusat',
-      imageUrls: ['https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80'],
-    ),
-    Laptop(
-      title: 'MSI Katana 15 B13V',
-      price: 'Rp 160.000/hari',
-      tags: ['16GB', 'RTX 4060'],
-      rating: 4.8,
-      reviews: 14,
-      imageUrl: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=300&q=80',
-      category: 'Gaming',
-      ram: '16GB',
-      processor: 'Intel Core',
-      priceNumeric: 160000.0,
-      isAvailable: true,
-      cpu: 'Intel Core i7-13620H',
-      storage: '1 TB SSD',
-      gpu: 'RTX 4060 8GB',
-      display: '15.6" FHD 144Hz',
-      os: 'Windows 11 Home',
-      priceWeek: 'Rp 1.0jt',
-      priceMonth: 'Rp 3.8jt',
-      shopName: 'Rafa Tech Laptop',
-      shopArea: 'Mangga Dua, Jakarta Barat',
-      imageUrls: ['https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=600&q=80'],
-    ),
-  ];
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  List<Laptop> _getFilteredLaptops() {
+  List<Laptop> _getFilteredLaptops(List<Laptop> allLaptops) {
     if (_searchQuery.isEmpty) return [];
-    return _allLaptops.where((laptop) {
+    return allLaptops.where((laptop) {
       final query = _searchQuery.toLowerCase();
       return laptop.title.toLowerCase().contains(query) ||
           laptop.category.toLowerCase().contains(query) ||
@@ -146,7 +47,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredLaptops = _getFilteredLaptops();
+    return BlocBuilder<LaptopBloc, LaptopState>(
+      builder: (context, state) {
+        List<Laptop> allLaptops = [];
+        if (state is LaptopLoaded) {
+          allLaptops = state.laptops;
+        }
+
+        final filteredLaptops = _getFilteredLaptops(allLaptops);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -204,13 +112,15 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       body: _searchQuery.isEmpty
-          ? _buildDefaultSearchView()
+          ? _buildDefaultSearchView(allLaptops)
           : _buildSearchResultsView(filteredLaptops),
+    );
+      },
     );
   }
 
   // Layout when user is not typing yet (Tokopedia/Shopee style default page)
-  Widget _buildDefaultSearchView() {
+  Widget _buildDefaultSearchView(List<Laptop> allLaptops) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       child: Column(
@@ -349,7 +259,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          _buildLaptopsGrid(_allLaptops),
+          _buildLaptopsGrid(allLaptops),
         ],
       ),
     );

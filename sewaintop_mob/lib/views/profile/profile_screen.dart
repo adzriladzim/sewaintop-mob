@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_bloc.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_event.dart';
+import 'package:sewaintop_mob/blocs/auth/auth_state.dart';
 import 'package:sewaintop_mob/constants/app_colors.dart';
 import 'package:sewaintop_mob/views/favorite/favorite_screen.dart'; // Import FavoriteScreen
+import 'package:sewaintop_mob/views/auth/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,101 +23,125 @@ class _ProfileScreenState extends State<ProfileScreen> {
     const Color roleBgColor = Color(0xFFEFF6FF); // Light blue
     const Color roleTextColor = AppColors.primary; // Blue
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Profil',
-          style: TextStyle(
-            color: AppColors.textDark,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is Unauthenticated) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (route) => false,
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: const Text(
+            'Profil',
+            style: TextStyle(
+              color: AppColors.textDark,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined, color: AppColors.textDark),
+              onPressed: () {},
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppColors.textDark),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-        child: Column(
-          children: [
-            // 1. User Info Card (RP avatar + Name + Edit Profile button)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.cardBorder, width: 1),
-              ),
+        body: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            String name = 'Guest User';
+            String email = 'guest@sewain.com';
+            String role = 'Penyewa';
+            String initials = 'GU';
+
+            if (state is Authenticated) {
+              name = state.user.name;
+              email = state.user.email;
+              role = state.user.role == 'pemilik' ? 'Pemilik Lapak' : 'Penyewa';
+              initials = state.user.avatarInitials;
+            }
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
               child: Column(
                 children: [
-                  // Blue Avatar Circle "RP"
+                  // 1. User Info Card (RP avatar + Name + Edit Profile button)
                   Container(
-                    width: 72,
-                    height: 72,
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'RP',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Name & Email
-                  const Text(
-                    'Rafi Prasetyo',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'rafi@email.com',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Role Badge: Penyewa
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: roleBgColor,
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder, width: 1),
                     ),
-                    child: const Text(
-                      'Penyewa',
-                      style: TextStyle(
-                        color: roleTextColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                    child: Column(
+                      children: [
+                        // Avatar Circle
+                        Container(
+                          width: 72,
+                          height: 72,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              initials,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
 
-                  // Edit Profil Text link (as in image)
-                  GestureDetector(
+                        // Name & Email
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          email,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Role Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: roleBgColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            role,
+                            style: const TextStyle(
+                              color: roleTextColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Edit Profil Text link (as in image)
+                        GestureDetector(
                     onTap: () {},
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -284,7 +313,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.read<AuthBloc>().add(LogoutRequested());
+                },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: warningText,
                   side: const BorderSide(color: warningText, width: 1.5),
@@ -307,7 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // 5. App version
             const Center(
               child: Text(
-                'SewaIn v1.0.0',
+                'Sewaintop v1.0.0',
                 style: TextStyle(
                   color: AppColors.textMuted,
                   fontSize: 12,
@@ -317,9 +348,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 16),
           ],
         ),
-      ),
-    );
-  }
+      );
+    },
+  ),
+),
+);
+}
 
   Widget _buildProfileRow({
     required IconData icon,
