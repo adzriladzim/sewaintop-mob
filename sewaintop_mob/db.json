@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Rafi Prasetyo",
       "email": "rafi@gmail.com",
       "phone": "081234567890",
@@ -10,7 +10,7 @@
       "avatarInitials": "RP"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Sari Wulandari",
       "email": "sari@gmail.com",
       "phone": "081298765432",
@@ -21,11 +21,14 @@
   ],
   "laptops": [
     {
-      "id": 1,
+      "id": "1",
       "title": "ASUS ROG Strix G15",
       "price": "Rp 150.000/hari",
       "priceNumeric": 150000,
-      "tags": ["16GB", "RTX 4060"],
+      "tags": [
+        "16GB",
+        "RTX 4060"
+      ],
       "rating": 4.9,
       "reviews": 18,
       "imageUrl": "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80",
@@ -49,11 +52,14 @@
       ]
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Lenovo Legion 5",
       "price": "Rp 130.000/hari",
       "priceNumeric": 130000,
-      "tags": ["16GB", "RTX 3060"],
+      "tags": [
+        "16GB",
+        "RTX 3060"
+      ],
       "rating": 4.7,
       "reviews": 9,
       "imageUrl": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=600&q=80",
@@ -76,11 +82,14 @@
       ]
     },
     {
-      "id": 3,
+      "id": "3",
       "title": "MacBook Pro 14",
       "price": "Rp 250.000/hari",
       "priceNumeric": 250000,
-      "tags": ["18GB", "M3 Pro"],
+      "tags": [
+        "18GB",
+        "M3 Pro"
+      ],
       "rating": 4.9,
       "reviews": 21,
       "imageUrl": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80",
@@ -103,11 +112,14 @@
       ]
     },
     {
-      "id": 4,
+      "id": "4",
       "title": "Dell XPS 13",
       "price": "Rp 110.000/hari",
       "priceNumeric": 110000,
-      "tags": ["8GB", "Intel i7"],
+      "tags": [
+        "8GB",
+        "Intel i7"
+      ],
       "rating": 4.6,
       "reviews": 15,
       "imageUrl": "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80",
@@ -129,11 +141,14 @@
       ]
     },
     {
-      "id": 5,
+      "id": "5",
       "title": "HP Victus 16",
       "price": "Rp 95.000/hari",
       "priceNumeric": 95000,
-      "tags": ["8GB", "RTX 3050"],
+      "tags": [
+        "8GB",
+        "RTX 3050"
+      ],
       "rating": 4.4,
       "reviews": 8,
       "imageUrl": "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80",
@@ -155,11 +170,14 @@
       ]
     },
     {
-      "id": 6,
+      "id": "6",
       "title": "MacBook Air M2",
       "price": "Rp 140.000/hari",
       "priceNumeric": 140000,
-      "tags": ["8GB", "M2 Chip"],
+      "tags": [
+        "8GB",
+        "M2 Chip"
+      ],
       "rating": 4.8,
       "reviews": 18,
       "imageUrl": "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=600&q=80",
@@ -181,11 +199,14 @@
       ]
     },
     {
-      "id": 7,
+      "id": "7",
       "title": "ASUS ZenBook Duo",
       "price": "Rp 280.000/hari",
       "priceNumeric": 280000,
-      "tags": ["32GB", "Dual Screen"],
+      "tags": [
+        "32GB",
+        "Dual Screen"
+      ],
       "rating": 4.7,
       "reviews": 6,
       "imageUrl": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=600&q=80",
@@ -207,11 +228,14 @@
       ]
     },
     {
-      "id": 8,
+      "id": "8",
       "title": "Acer Aspire 5",
       "price": "Rp 60.000/hari",
       "priceNumeric": 60000,
-      "tags": ["4GB", "Core i3"],
+      "tags": [
+        "4GB",
+        "Core i3"
+      ],
       "rating": 4.1,
       "reviews": 5,
       "imageUrl": "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80",
@@ -235,7 +259,7 @@
   ],
   "bookings": [
     {
-      "id": 1,
+      "id": "1",
       "userId": 1,
       "laptopId": 1,
       "laptopTitle": "ASUS ROG Strix G15",
@@ -245,13 +269,13 @@
       "duration": 5,
       "pricePerDay": 150000,
       "totalPrice": 750000,
-      "status": "active",
+      "status": "cancelled",
       "notes": "Perlu tas laptop",
       "shopName": "Rafa Tech Laptop",
       "createdAt": "2026-06-10T08:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "userId": 1,
       "laptopId": 3,
       "laptopTitle": "MacBook Pro 14",
@@ -267,7 +291,7 @@
       "createdAt": "2026-04-25T10:30:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "userId": 1,
       "laptopId": 2,
       "laptopTitle": "Lenovo Legion 5",
@@ -281,6 +305,87 @@
       "notes": "Batal, sudah dapat laptop sendiri",
       "shopName": "Mega Rental Indo",
       "createdAt": "2026-04-05T14:00:00Z"
+    },
+    {
+      "userId": 1,
+      "laptopId": 5,
+      "laptopTitle": "HP Victus 16",
+      "laptopImage": "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80",
+      "startDate": "2026-06-09",
+      "endDate": "2026-06-13",
+      "duration": 4,
+      "pricePerDay": 95000,
+      "totalPrice": 380000,
+      "status": "active",
+      "notes": "",
+      "shopName": "Computer Square",
+      "createdAt": "2026-07-06T11:53:07.594613",
+      "id": "x-py5rfAXmM"
+    },
+    {
+      "userId": 1,
+      "laptopId": 8,
+      "laptopTitle": "Acer Aspire 5",
+      "laptopImage": "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80",
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-20",
+      "duration": 5,
+      "pricePerDay": 60000,
+      "totalPrice": 300000,
+      "status": "active",
+      "notes": "",
+      "shopName": "Computer Square",
+      "createdAt": "2026-07-06T11:53:18.588912",
+      "id": "Bq7EbcmgZoM"
+    },
+    {
+      "userId": 1,
+      "laptopId": 8,
+      "laptopTitle": "Acer Aspire 5",
+      "laptopImage": "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80",
+      "startDate": "2026-06-10",
+      "endDate": "2026-06-12",
+      "duration": 2,
+      "pricePerDay": 60000,
+      "totalPrice": 120000,
+      "status": "active",
+      "notes": "",
+      "shopName": "Computer Square",
+      "createdAt": "2026-07-06T13:26:37.916180",
+      "id": "A6Pxfb3dY8I"
+    },
+    {
+      "userId": 1,
+      "laptopId": 8,
+      "laptopTitle": "Acer Aspire 5",
+      "laptopImage": "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80",
+      "startDate": "2026-06-15",
+      "endDate": "2026-06-19",
+      "duration": 4,
+      "pricePerDay": 60000,
+      "totalPrice": 240000,
+      "status": "active",
+      "notes": "",
+      "shopName": "Computer Square",
+      "createdAt": "2026-07-06T13:39:38.020308",
+      "id": "xA83zyoBVpw"
+    },
+    {
+      "userId": 2,
+      "laptopId": 3,
+      "laptopTitle": "MacBook Pro 14",
+      "laptopImage": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80",
+      "startDate": "2026-06-23",
+      "endDate": "2026-06-23",
+      "duration": 0,
+      "pricePerDay": 250000,
+      "totalPrice": 0,
+      "status": "active",
+      "notes": "",
+      "shopName": "Apple Space Jakarta",
+      "createdAt": "2026-07-06T13:59:55.850899",
+      "id": "j1ypjYlKZL8"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

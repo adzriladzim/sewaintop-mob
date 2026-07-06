@@ -31,6 +31,7 @@ class AuthRepository {
 
       return user;
     } catch (e) {
+      debugPrint('[AuthRepo] Login error details: $e');
       if (e.toString().contains('Email atau password salah')) rethrow;
       throw Exception('Gagal login. Periksa koneksi internet Anda.');
     }

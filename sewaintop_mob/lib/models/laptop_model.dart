@@ -54,7 +54,7 @@ class Laptop extends Equatable {
   // ── JSON (API) ──────────────────────────────────────
   factory Laptop.fromJson(Map<String, dynamic> json) {
     return Laptop(
-      id: json['id'] as int,
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id'].toString()) ?? 0,
       title: json['title'] as String,
       price: json['price'] as String,
       tags: List<String>.from(json['tags'] ?? []),

@@ -540,13 +540,13 @@ class _LaptopDetailScreenState extends State<LaptopDetailScreen> {
     // Custom June 2026 Grid as shown in the screenshot:
     // Sunday (Min) starts on Day 1.
     // Days 10, 11, 12, 13, 14, 20, 21, 22 are highlighted.
-    // Days 1 and 5 have blue outlines.
+    // Days 5 have blue outlines.
     final List<String> weekdays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
     final List<int?> days = List.generate(30, (index) => index + 1);
 
     // Ranges to highlight
     final Set<int> highlightedDays = {10, 11, 12, 13, 14, 20, 21, 22};
-    final Set<int> outlinedDays = {1, 5};
+    final Set<int> outlinedDays = {5};
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -620,22 +620,16 @@ class _LaptopDetailScreenState extends State<LaptopDetailScreen> {
               final isHighlighted = highlightedDays.contains(day);
               final isOutlined = outlinedDays.contains(day);
 
-              // Calculate border radius for ranges
-              BorderRadius? borderRadius;
-              if (isHighlighted) {
-                if (day == 10 || day == 20) {
-                  borderRadius = const BorderRadius.horizontal(left: Radius.circular(16));
-                } else if (day == 14 || day == 22) {
-                  borderRadius = const BorderRadius.horizontal(right: Radius.circular(16));
-                }
-              }
+
 
               return Container(
                 decoration: BoxDecoration(
-                  color: isHighlighted ? AppColors.primary.withOpacity(0.12) : null,
-                  borderRadius: borderRadius,
+                  color: isHighlighted
+                      ? const Color(0xFFFEF2F2)
+                      : null,
+                  borderRadius: isHighlighted ? BorderRadius.circular(8) : null,
                   border: isOutlined
-                      ? Border.all(color: AppColors.primary, width: 1)
+                      ? Border.all(color: AppColors.primary, width: 1.5)
                       : null,
                   shape: isOutlined ? BoxShape.circle : BoxShape.rectangle,
                 ),
@@ -649,7 +643,8 @@ class _LaptopDetailScreenState extends State<LaptopDetailScreen> {
                           : FontWeight.normal,
                       color: isOutlined
                           ? AppColors.primary
-                          : (isHighlighted ? AppColors.primary : AppColors.textDark),
+                          : (isHighlighted ? const Color(0xFFEF4444) : AppColors.textDark),
+                      decoration: isHighlighted ? TextDecoration.lineThrough : null,
                     ),
                   ),
                 ),

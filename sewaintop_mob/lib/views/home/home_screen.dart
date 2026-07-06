@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
     'Video Editing'
   ];
 
-  List<Laptop> _laptops = [];
 
   @override
   void initState() {

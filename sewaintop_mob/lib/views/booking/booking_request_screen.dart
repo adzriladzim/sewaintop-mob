@@ -22,14 +22,14 @@ class BookingRequestScreen extends StatefulWidget {
 
 class _BookingRequestScreenState extends State<BookingRequestScreen> {
   
-  // Initial date selection to match June 15 - June 20, 2026
+  // Initial date selection to match June 15 - June 19, 2026 (avoiding blocked day 20)
   DateTime _startDate = DateTime(2026, 6, 15);
-  DateTime _endDate = DateTime(2026, 6, 20);
+  DateTime _endDate = DateTime(2026, 6, 19);
 
   final TextEditingController _notesController = TextEditingController();
 
   // Unavailable/Blocked dates for June 2026 (matching previous screen & screenshot)
-  final Set<int> _blockedDays = {10, 11, 12};
+  final Set<int> _blockedDays = {10, 11, 12, 13, 14, 20, 21, 22};
 
   @override
   void dispose() {
@@ -70,19 +70,97 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     return 'Rp $result';
   }
 
+  bool rangeContainsBlockedDays(DateTime start, DateTime end) {
+    DateTime current = start;
+    while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
+      if (current.month == 6 && _blockedDays.contains(current.day)) {
+        return true;
+      }
+      current = current.add(const Duration(days: 1));
+    }
+    return false;
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isStart) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: isStart ? _startDate : _endDate,
+      firstDate: DateTime(2026, 6, 1),
+      lastDate: DateTime(2026, 6, 30),
+      selectableDayPredicate: (day) => !_blockedDays.contains(day.day),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              onSurface: AppColors.textDark,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          final tentativeStart = picked;
+          if (rangeContainsBlockedDays(tentativeStart, _endDate) || tentativeStart.isAfter(_endDate)) {
+            _startDate = tentativeStart;
+            _endDate = tentativeStart;
+          } else {
+            _startDate = tentativeStart;
+          }
+        } else {
+          final tentativeEnd = picked;
+          if (rangeContainsBlockedDays(_startDate, tentativeEnd) || tentativeEnd.isBefore(_startDate)) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Rentang tanggal melewati tanggal yang sudah dibooking!'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            _startDate = tentativeEnd;
+            _endDate = tentativeEnd;
+          } else {
+            _endDate = tentativeEnd;
+          }
+        }
+      });
+    }
+  }
+
   void _onDayTapped(int day) {
-    if (_blockedDays.contains(day)) return; // Can't select blocked dates
+    if (_blockedDays.contains(day)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tanggal ini sudah dibooking orang lain.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
 
     final tappedDate = DateTime(2026, 6, day);
 
     setState(() {
-      // Simple range selection logic
-      if (tappedDate.isBefore(_startDate)) {
-        _startDate = tappedDate;
-      } else if (tappedDate.isAfter(_startDate)) {
-        _endDate = tappedDate;
+      if (tappedDate.isAfter(_startDate)) {
+        if (rangeContainsBlockedDays(_startDate, tappedDate)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Rentang tanggal melewati tanggal yang sudah dibooking!'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _startDate = tappedDate;
+          _endDate = tappedDate;
+        } else {
+          _endDate = tappedDate;
+        }
       } else {
-        // Tapped the start date again, do nothing or reset
+        _startDate = tappedDate;
+        _endDate = tappedDate;
       }
     });
   }
@@ -249,9 +327,9 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                   // Mulai / Selesai Picker Boxes
                   Row(
                     children: [
-                      _buildDateDisplayBox('Mulai', _startDate),
+                      _buildDateDisplayBox('Mulai', _startDate, true),
                       const SizedBox(width: 12),
-                      _buildDateDisplayBox('Selesai', _endDate),
+                      _buildDateDisplayBox('Selesai', _endDate, false),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -481,46 +559,49 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     );
   }
 
-  Widget _buildDateDisplayBox(String label, DateTime date) {
+  Widget _buildDateDisplayBox(String label, DateTime date, bool isStart) {
     return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textMuted,
+      child: GestureDetector(
+        onTap: () => _selectDate(context, isStart),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textMuted,
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.primary, width: 1.5),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.calendar_today_outlined,
-                  color: AppColors.primary,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  _formatDate(date),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.primary, width: 1.5),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    color: AppColors.primary,
+                    size: 16,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    _formatDate(date),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -613,11 +694,17 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                 onTap: () => _onDayTapped(day),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isStart || isEnd
-                        ? AppColors.primary
-                        : (inRange ? AppColors.primary.withOpacity(0.12) : null),
+                    color: isBlocked
+                        ? const Color(0xFFFEF2F2)
+                        : (isStart || isEnd
+                            ? AppColors.primary
+                            : (inRange ? AppColors.primary.withOpacity(0.12) : null)),
                     shape: isStart || isEnd ? BoxShape.circle : BoxShape.rectangle,
-                    borderRadius: inRange ? BorderRadius.circular(4) : null,
+                    borderRadius: isStart || isEnd
+                        ? null
+                        : (isBlocked 
+                            ? BorderRadius.circular(8) 
+                            : (inRange ? BorderRadius.circular(4) : null)),
                   ),
                   child: Center(
                     child: Text(
@@ -628,10 +715,11 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                             ? FontWeight.bold
                             : FontWeight.normal,
                         color: isBlocked
-                            ? Colors.red.shade400
+                            ? const Color(0xFFEF4444)
                             : (isStart || isEnd
                                 ? Colors.white
                                 : (inRange ? AppColors.primary : AppColors.textDark)),
+                        decoration: isBlocked ? TextDecoration.lineThrough : null,
                       ),
                     ),
                   ),

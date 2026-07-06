@@ -36,9 +36,9 @@ class Booking extends Equatable {
   // ── JSON (API) ──────────────────────────────────────
   factory Booking.fromJson(Map<String, dynamic> json) {
     return Booking(
-      id: json['id'] as int,
-      userId: json['userId'] as int,
-      laptopId: json['laptopId'] as int,
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id'].toString()) ?? 0,
+      userId: json['userId'] is int ? json['userId'] as int : int.tryParse(json['userId'].toString()) ?? 0,
+      laptopId: json['laptopId'] is int ? json['laptopId'] as int : int.tryParse(json['laptopId'].toString()) ?? 0,
       laptopTitle: json['laptopTitle'] as String,
       laptopImage: json['laptopImage'] as String? ?? '',
       startDate: json['startDate'] as String,

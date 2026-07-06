@@ -23,7 +23,7 @@ class User extends Equatable {
   // ── JSON (API) ──────────────────────────────────────
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as int,
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String? ?? '',
@@ -60,7 +60,7 @@ class User extends Equatable {
   factory User.fromPrefsJson(String source) {
     final json = jsonDecode(source) as Map<String, dynamic>;
     return User(
-      id: json['id'] as int,
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String? ?? '',

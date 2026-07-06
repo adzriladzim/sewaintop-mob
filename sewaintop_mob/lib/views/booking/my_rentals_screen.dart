@@ -28,6 +28,7 @@ class _MyRentalsScreenState extends State<MyRentalsScreen> {
       context.read<BookingBloc>().add(LoadMyBookings(userId: authState.user.id));
     }
   }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
