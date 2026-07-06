@@ -9,18 +9,13 @@ import 'package:sewaintop_mob/repositories/laptop_repository.dart';
 import 'package:sewaintop_mob/repositories/booking_repository.dart';
 import 'package:sewaintop_mob/data/local_database.dart';
 import 'package:sewaintop_mob/views/auth/splash_screen.dart';
-import 'package:sewaintop_mob/views/dashboard/dashboard_view.dart';
-import 'package:sewaintop_mob/views/inventory/inventory_view.dart';
-import 'package:sewaintop_mob/views/inventory/add_laptop_view.dart';
-import 'package:sewaintop_mob/views/booking_management/booking_request_view.dart';
-import 'package:sewaintop_mob/views/calendar/calendar_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Local SQLite Database
-  // final localDb = LocalDatabase();
-  // await localDb.database;
+  final localDb = LocalDatabase();
+  await localDb.database;
 
   // Initialize Repositories
   final authRepository = AuthRepository();
@@ -77,7 +72,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
             fontFamily: 'Inter',
           ),
-          home: const DashboardView(),
+          home: const SplashScreen(),
         ),
       ),
     );
