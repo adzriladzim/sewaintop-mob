@@ -3,8 +3,8 @@ class AppConfig {
   // ── API ────────────────────────────────────────────────
   // Android emulator → 10.0.2.2 maps to host localhost
   // iOS simulator / Desktop / Web → localhost
-  static const String apiBaseUrl = 'http://10.0.2.2:3000';
-  static const String apiBaseUrlDesktop = 'http://localhost:3000';
+  static const String apiBaseUrl = 'http://127.0.0.1:3000';
+  static const String apiBaseUrlDesktop = 'http://127.0.0.1:3000';
   static const Duration apiTimeout = Duration(seconds: 8);
 
   // ── Local Database ────────────────────────────────────
